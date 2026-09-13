@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Quiz World - Sign Up</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../css/register.css">
+
+</head>
+<body>
+
+    <!-- Navigation Arrows -->
+
+    <div class="navigation-arrows">
+
+        <!-- Back Button -->
+        <a href="../html/login.html" class="arrow-btn">
+            &#8592;
+        </a>
+
+        <!-- Next Button -->
+        <a href="../html/dashboard.html" class="arrow-btn">
+            &#8594;
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <!-- Left Side -->
+
+        <div class="left-side">
+
+            <h1>Join Quiz World!</h1>
+
+            <p>
+                Join thousands of learners and
+                begin your quiz journey with us.
+            </p>
+
+        </div>
+
+
+        <!-- Right Side -->
+
+        <div class="right-side">
+
+            <h1>Create Account</h1>
+
+
+            <!-- Registration Form -->
+
+            <form id="registerForm"
+                  action="register.php"
+                  method="POST">
+
+                <input
+                    type="text"
+                    id="fullname"
+                    name="fullname"
+                    placeholder="Full Name">
+
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Email">
+
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Username">
+
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Password">
+
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Confirm Password">
+
+
+                <!-- Terms & Conditions -->
+
+                <div class="checkbox">
+
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        name="terms">
+
+                    <label>
+                        I agree to the Terms & Conditions
+                    </label>
+
+                </div>
+
+
+                <!-- Sign Up Button -->
+
+                <button type="submit">
+
+                    Sign Up
+
+                </button>
+
+            </form>
+
+
+            <!-- Login Link -->
+
+            <p class="login-link">
+
+                Already have an account?
+
+                <a href="login.html">
+                    Login
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+    <div class="role-selector">
+
+    <label for="role">Role:</label>
+
+    <select id="role" onchange="changeRole()">
+
+        <option value="student">User</option>
+        <option value="admin">Admin</option>
+
+    </select>
+
+</div>
+
+
+    <!-- JavaScript File -->
+
+    <script src="../js/register.js"></script>
+
+</body>
+</html>

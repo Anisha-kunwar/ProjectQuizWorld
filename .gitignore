@@ -1,0 +1,14 @@
+# XAMPP / local files
+*.log
+*.tmp
+
+# Environment / secrets
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/

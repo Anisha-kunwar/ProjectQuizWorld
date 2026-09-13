@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="../css/styleforget.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">
+                <img src="logo.jpeg" alt="Online Quiz platform">
+            </div>
+        </div>
+
+        <nav class="nav-bar">
+            <a href="home.html">Home</a>
+
+            <a href="categories.html">Categories</a>
+            <a href="leaderboard.html">Leaderbord</a>
+            <a href="contact.html">Contact us</a>
+        </nav>
+
+    </header>
+    <main>
+        <div class="forgot-container">
+            <h1>Forget Password:</h1>
+            <div class="input-wrapper">
+                <label for="email">Email id:</label>
+                <input type="email" id="email" placeholder="enter your email id">
+                <br><br>
+
+                <label for="send-btn">Send otp in your email</label>
+                <button id="send-btn" onclick="sendOtp()">send</button>
+                <div id="otp-wrapper" style="display: none; margin-top: 15px;">
+                    <label for="otp">Enter OTP</label>
+                    <input type="text" id="otp" placeholder="enter 6-digit OTP" maxlength="6">
+                    <button id="verify-btn">Verify</button>
+                </div>
+            </div>
+        </div>
+    </main>
+     <script src="../js/forgotpsw.js"></script>
+    </body>
+    </html>

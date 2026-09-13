@@ -1,0 +1,118 @@
+/* ==========================================================================
+   QUIZ WORLD — Certificate Page
+   ========================================================================== */
+
+:root {
+    --black:        #0A0B0E;
+    --black-card:   #16181F;
+    --black-line:   #22242E;
+    --blue:         #1E4FFF;
+    --blue-bright:  #4C77FF;
+    --red:          #FF2E4D;
+    --red-glow:     rgba(255, 46, 77, 0.4);
+    --white:        #F4F5F7;
+    --white-dim:    rgba(244, 245, 247, 0.64);
+    --font-display: 'Poppins', sans-serif;
+    --font-script:  'Great Vibes', cursive;
+    --font-serif:   'Cinzel', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+    background-image: radial-gradient(circle at 50% 20%, rgba(30,79,255,0.10) 0%, transparent 55%);
+}
+
+.navigation-arrows {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 30px;
+}
+.arrow-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--black-line);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    font-size: 18px;
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+.arrow-btn:hover { border-color: var(--red); color: var(--red); }
+
+.certificate-container {
+    position: relative;
+    max-width: 900px;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(30,79,255,0.18);
+    border: 1px solid var(--black-line);
+}
+
+.certificate-img { width: 100%; display: block; }
+
+#name {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-script);
+    font-size: 44px;
+    color: var(--blue-bright);
+    text-shadow: 0 0 20px rgba(30,79,255,0.5);
+}
+
+#subject {
+    position: absolute;
+    top: 54%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-serif);
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--white);
+}
+
+#score {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--red);
+}
+
+#date {
+    position: absolute;
+    bottom: 12%;
+    left: 25%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--white-dim);
+}
+
+#certificateID {
+    position: absolute;
+    bottom: 12%;
+    right: 25%;
+    transform: translateX(50%);
+    font-size: 12px;
+    color: var(--white-dim);
+}
+
+@media (max-width: 640px) {
+    #name { font-size: 28px; }
+    #subject { font-size: 15px; }
+}

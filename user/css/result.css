@@ -1,0 +1,139 @@
+/* ==========================================================================
+   QUIZ WORLD — Result
+   ========================================================================== */
+
+:root {
+    --black:        #0A0B0E;
+    --black-card:   #16181F;
+    --black-line:   #22242E;
+    --blue:         #1E4FFF;
+    --blue-bright:  #4C77FF;
+    --red:          #FF2E4D;
+    --red-glow:     rgba(255, 46, 77, 0.45);
+    --white:        #F4F5F7;
+    --white-dim:    rgba(244, 245, 247, 0.64);
+    --font-display: 'Poppins', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background-image: radial-gradient(circle at 50% 10%, rgba(30,79,255,0.14) 0%, transparent 50%);
+}
+
+.navigation-arrows {
+    position: fixed;
+    top: 30px;
+    left: 60px;
+    right: 60px;
+    display: flex;
+    justify-content: space-between;
+}
+.arrow-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--black-line);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 18px;
+    background: var(--black);
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+.arrow-btn:hover { border-color: var(--red); color: var(--red); }
+
+.result-card {
+    max-width: 460px;
+    width: 100%;
+    background: var(--black-card);
+    border: 1px solid var(--black-line);
+    border-radius: 18px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(30,79,255,0.14);
+}
+
+.trophy {
+    font-size: 46px;
+    color: var(--red);
+    text-shadow: 0 0 30px var(--red-glow);
+    margin-bottom: 18px;
+}
+
+.result-card h1 { font-size: 24px; margin-bottom: 30px; }
+
+.score-circle {
+    width: 140px; height: 140px;
+    margin: 0 auto 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    background: conic-gradient(var(--blue-bright) 80%, var(--black-line) 0);
+    position: relative;
+}
+.score-circle::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: var(--black-card);
+}
+.score-circle { z-index: 0; }
+.score-circle::before { z-index: 1; }
+.score-circle { position: relative; }
+.score-circle > * { position: relative; z-index: 2; }
+
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 34px;
+    text-align: left;
+    background: var(--black);
+    border: 1px solid var(--black-line);
+    border-radius: 10px;
+    padding: 18px 20px;
+}
+.details p {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--white-dim);
+}
+.details p span { font-family: var(--font-mono); font-weight: 700; color: var(--white); }
+
+.buttons { display: flex; flex-direction: column; gap: 12px; }
+.buttons button {
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease;
+}
+.buttons button:hover { transform: translateY(-2px); }
+
+#tryAgain { background: transparent; border: 1px solid var(--blue); color: var(--white); }
+#leaderboard { background: transparent; border: 1px solid var(--black-line); color: var(--white-dim); }
+#certificate { background: var(--red); color: var(--white); box-shadow: 0 0 20px var(--red-glow); }
+
+@media (max-width: 520px) {
+    .result-card { padding: 40px 26px; }
+    .navigation-arrows { left: 20px; right: 20px; }
+}

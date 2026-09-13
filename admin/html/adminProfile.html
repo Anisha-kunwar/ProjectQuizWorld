@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styleProfile.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">
+        <img src="logo.jpeg" alt="Online Quiz Platform">
+      </div>
+    </div>
+    <nav class="nav-bar">
+      <input type="text" placeholder="search/help">
+    </nav>
+  </header>
+  <div class="main-container">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="admin-header">
+          <div class="admin-icon">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <a href="adminProfile.html">
+            <span class="admin-title">Admin</span>
+          </a>
+        </div>
+
+        <ul class="sidebar-menu">
+          <li><a href="adminDashboard.html">Admin Dashboard</a></li>
+          <li><a href="manageCategories.html">Manage Categories</a></li>
+          <li><a href="manageQuestion.html">Manage Questions</a></li>
+          <li><a href="userDetails.html">User Details</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-bottom">
+        <a href="adminlogin.html" class="logout-btn" id="logoutBtn">Log out</a>
+      </div>
+    </aside>
+    <main class="content-area">
+
+      <section class="profile-section">
+        <div class="avatar-column">
+          <div class="avatar-circle">
+            <i class="fa-regular fa-user avatar-icon"></i>
+          </div>
+          <a href="#" class="link-action">Change Profile Picture</a>
+          <button type="button" class="btn-change-password" id="changePasswordBtn">Change Password</button>
+        </div>
+        <div class="details-column">
+          <div class="form-row">
+            <label for="username">Name:</label>
+            <div class="input-wrapper">
+              <input type="text" id="username" readonly>
+              <span class="edit-trigger" id="editNameBtn">edit</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="email">Email:</label>
+            <div class="input-wrapper">
+              <input type="email" id="email" readonly>
+            </div>
+          </div>
+
+          <p class="save-msg" id="nameSavedMsg" style="display:none;">Name updated &#10003;</p>
+        </div>
+      </section>
+      <section class="password-section hidden" id="passwordSection">
+        <div class="form-row">
+          <label for="current-password">Current Password:</label>
+          <div class="input-column">
+            <input type="password" id="current-password">
+            <a href="forgotpsw.html" class="forgot-password">forgot password ?</a>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="new-password">New Password:</label>
+          <div class="input-column">
+            <input type="password" id="new-password">
+          </div>
+        </div>
+
+        <p class="error-message" id="passwordError" style="display:none;"></p>
+
+        <div class="form-actions">
+          <button type="button" class="btn-save" id="saveBtn">Save</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+   <script src="../js/adminProfile.js"></script>
+  </body>
+  </html>
+
+  

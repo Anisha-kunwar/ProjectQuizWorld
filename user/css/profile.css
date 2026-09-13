@@ -1,0 +1,173 @@
+/* ==========================================================================
+   QUIZ WORLD — Profile
+   ========================================================================== */
+
+:root {
+    --black:        #0A0B0E;
+    --black-soft:   #121319;
+    --black-card:   #16181F;
+    --black-line:   #22242E;
+    --blue:         #1E4FFF;
+    --blue-bright:  #4C77FF;
+    --red:          #FF2E4D;
+    --red-glow:     rgba(255, 46, 77, 0.4);
+    --white:        #F4F5F7;
+    --white-dim:    rgba(244, 245, 247, 0.64);
+    --font-display: 'Poppins', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { background: var(--black); color: var(--white); font-family: var(--font-display); position: relative; }
+
+.arrow-btn {
+    position: fixed;
+    top: 30px;
+    width: 44px; height: 44px;
+    border: 1px solid var(--black-line);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 18px;
+    background: var(--black);
+    z-index: 50;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+.arrow-btn:hover { border-color: var(--red); color: var(--red); }
+.arrow-btn:first-of-type { left: 30px; }
+.arrow-btn:last-of-type { right: 30px; }
+
+.container { display: flex; min-height: 100vh; }
+
+/* ---------------- Sidebar ---------------- */
+.sidebar {
+    width: 260px;
+    background: var(--black-soft);
+    border-right: 1px solid var(--black-line);
+    padding: 50px 26px;
+    text-align: center;
+}
+#sidebarImage {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 16px;
+    border: 2px solid var(--blue-bright);
+    box-shadow: 0 0 20px rgba(30, 79, 255, 0.471);
+}
+.sidebar h2 { font-size: 17px; margin-bottom: 4px; }
+.sidebar p { font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 30px; }
+
+.sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.sidebar ul a { text-decoration: none; }
+.sidebar ul li {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--white-dim);
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.sidebar ul li:hover {
+    background: rgba(30,79,255,0.10);
+    color: var(--white);
+    border-left-color: var(--blue-bright);
+}
+
+/* ---------------- Main content ---------------- */
+.main-content { flex: 1; padding: 50px 60px; }
+
+.tabs { display: flex; gap: 10px; margin-bottom: 34px; }
+.tabs button {
+    padding: 12px 24px;
+    background: transparent;
+    border: 1px solid var(--black-line);
+    color: var(--white-dim);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.tabs button:hover { border-color: var(--blue); color: var(--white); }
+#profileTab { background: var(--red); border-color: var(--red); color: var(--white); }
+
+#profileSection, #passwordSection {
+    background: var(--black-card);
+    border: 1px solid var(--black-line);
+    border-radius: 14px;
+    padding: 36px;
+    display: flex;
+    gap: 40px;
+}
+#passwordSection { display: flex; flex-direction: column; max-width: 400px; gap: 16px; }
+
+.image-section { text-align: center; }
+#profileImage {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--blue-bright);
+    box-shadow: 0 0 24px rgba(30,79,255,0.3);
+    margin-bottom: 16px;
+}
+.upload-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border: 1px solid var(--blue);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--white);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.upload-btn:hover { background: rgba(30,79,255,0.12); }
+
+.form-section { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.form-section label, #passwordSection label {
+    font-size: 12px;
+    color: var(--white-dim);
+    margin-top: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.form-section input, .form-section textarea, #passwordSection input {
+    padding: 12px 14px;
+    background: var(--black);
+    border: 1px solid var(--black-line);
+    border-radius: 8px;
+    color: var(--white);
+    font-size: 14px;
+    font-family: inherit;
+    margin-top: 6px;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+}
+.form-section input:focus, .form-section textarea:focus, #passwordSection input:focus {
+    outline: none; border-color: var(--blue);
+}
+
+.save-btn {
+    margin-top: 24px;
+    padding: 13px 28px;
+    align-self: flex-start;
+    background: var(--red);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--red-glow);
+}
+
+@media (max-width: 900px) {
+    #profileSection { flex-direction: column; align-items: center; }
+}
+@media (max-width: 768px) {
+    .container { flex-direction: column; }
+    .sidebar { width: 100%; padding: 30px 20px; }
+    .main-content { padding: 30px 20px; }
+}

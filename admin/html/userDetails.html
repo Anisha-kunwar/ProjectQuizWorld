@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Details</title>
+  <link rel="stylesheet" href="../css/styleUserDetails.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">
+        <img src="logo.jpeg" alt="Online Quiz Platform">
+      </div>
+    </div>
+    <nav class="nav-bar">
+      <input type="text" placeholder="search/help">
+    </nav>
+  </header>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="admin-header">
+          <div class="admin-icon">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <a href="adminProfile.html">
+            <span class="admin-title">Admin</span>
+          </a>
+        </div>
+        <ul class="sidebar-menu">
+          <li><a href="adminDashboard.html">Admin Dashboard</a></li>
+          <li><a href="manageCategories.html">Manage Categories</a></li>
+          <li><a href="manageQuestion.html">Manage Questions</a></li>
+          <li><a href="userDetails.html">User Details</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-bottom">
+        <a href="adminlogin.html" class="logout-btn">Log out</a>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <h1 class="page-title">User Details</h1>
+
+      <div class="filter-row">
+        <label for="subjectFilter">Select Subject</label>
+        <select id="subjectFilter">
+          <option value="">-- All Subjects --</option>
+          <option value="">Subject 1</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="records-table">
+          <thead>
+            <tr>
+              <th>SID</th>
+              <th>Student</th>
+              <th>Email</th>
+              <th>Quiz Attempts</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody">
+
+          </tbody>
+        </table>
+        <p class="empty-message" id="emptyMessage" style="display:none;">No student records yet.</p>
+      </div>
+    </main>
+  </div>
+  <script src="../js/userDetails.js"></script>
+  </body>
+  </html>

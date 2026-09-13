@@ -1,0 +1,118 @@
+/* ==========================================================================
+   QUIZ WORLD — Categories Page
+   Same HUD design language as the homepage: black base, blue structure,
+   red for the interactive spark, corner-bracket signature on every card.
+   ========================================================================== */
+
+:root {
+    --black:        #0A0B0E;
+    --black-soft:   #121319;
+    --black-card:   #16181F;
+    --black-line:   #22242E;
+
+    --blue:         #1E4FFF;
+    --blue-bright:  #4C77FF;
+    --blue-deep:    #0B1F5C;
+    --blue-glow:    rgba(30, 79, 255, 0.35);
+
+    --red:          #FF2E4D;
+    --red-glow:     rgba(255, 46, 77, 0.45);
+
+    --white:        #F4F5F7;
+    --white-dim:    rgba(244, 245, 247, 0.64);
+
+    --font-display: 'Poppins', sans-serif;
+    --radius: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    padding: 40px 60px 80px;
+    background-image: radial-gradient(circle at 50% 0%, rgba(30,79,255,0.10) 0%, transparent 50%);
+}
+
+.navigation-arrows {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto 30px;
+}
+.arrow-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--black-line);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
+    font-size: 18px;
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+.arrow-btn:hover { border-color: var(--red); color: var(--red); }
+
+.container { max-width: 1100px; margin: 0 auto; text-align: center; }
+
+h1 { font-size: 34px; font-weight: 700; }
+.subtitle { color: var(--white-dim); font-size: 15px; margin-top: 10px; margin-bottom: 50px; }
+
+.category-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+.card {
+    position: relative;
+    background: var(--black-card);
+    border: 1px solid var(--black-line);
+    border-radius: var(--radius);
+    padding: 34px 22px;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.card::before, .card::after {
+    content: "";
+    position: absolute;
+    width: 14px; height: 14px;
+    border-color: var(--blue-bright);
+    transition: border-color 0.25s ease, width 0.25s ease, height 0.25s ease;
+}
+.card::before { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
+.card::after  { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+.card:hover { transform: translateY(-6px); border-color: var(--blue); }
+.card:hover::before, .card:hover::after { border-color: var(--red); width: 20px; height: 20px; }
+
+.card h2 { font-size: 19px; margin-bottom: 10px; }
+.card p { font-size: 13px; color: var(--white-dim); margin-bottom: 24px; min-height: 40px; }
+
+.card button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    background: transparent;
+    border: 1px solid var(--blue);
+    color: var(--white);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.card button:hover { background: var(--red); border-color: var(--red); }
+
+/* subtle per-category tint via left accent */
+.card.programming { border-left: 3px solid var(--blue); }
+.card.science      { border-left: 3px solid var(--blue-bright); }
+.card.math          { border-left: 3px solid var(--red); }
+.card.gk            { border-left: 3px solid #2EFF96; }
+
+@media (max-width: 1024px) {
+    .category-container { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+    body { padding: 30px 20px 60px; }
+    .category-container { grid-template-columns: 1fr; }
+}

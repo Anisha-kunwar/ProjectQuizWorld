@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz World | Login</title>
+
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+
+<body>
+
+    <!-- Navigation Arrows -->
+
+    <div class="navigation-arrows">
+
+        <!-- Back Button -->
+        <a href="../html/index.html" class="arrow-btn">
+            &#8592;
+        </a>
+
+        <!-- Next Button -->
+        <a href="../html/register.html" class="arrow-btn">
+            &#8594;
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <!-- Left Side -->
+
+        <div class="left-side">
+
+            <h1>Welcome Back!</h1>
+
+            <p>
+                Login to continue your Quiz World journey
+                and challenge yourself.
+            </p>
+
+        </div>
+
+
+        <!-- Right Side -->
+
+        <div class="right-side">
+
+            <h1>Login</h1>
+
+            <!-- Login Form -->
+
+            <form id="loginForm" action="../php/login.php" method="POST">
+
+                <!-- Username -->
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Username or Email">
+
+                <!-- Password -->
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Password">
+
+                <!-- Remember Me -->
+
+                <div class="options">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="remember">
+
+                        Remember Me
+
+                    </label>
+
+                    <a href="#">
+                        Forgot Password?
+                    </a>
+
+                </div>
+
+                <!-- Login Button -->
+
+                <button type="submit">
+
+                    Login
+
+                </button>
+
+            </form>
+
+            <!-- Sign Up -->
+
+            <p class="signup-link">
+
+                Don't have an account?
+
+                <a href="../html/register.html">
+
+                    Sign Up
+
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <script src="../js/login.js"></script>
+
+</body>
+
+</html>
