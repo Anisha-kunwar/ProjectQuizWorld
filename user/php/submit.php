@@ -8,14 +8,14 @@ header("Content-Type: application/json");
 
 
 // ------------------------------------
-// CHECK LOGIN
+// HELPER FUNCTION
 // ------------------------------------
 
-if (!isset($_SESSION["user_id"])) {
-
+function sendError($message)
+{
     echo json_encode([
         "success" => false,
-        "message" => "User is not logged in."
+        "message" => $message
     ]);
 
     exit;
@@ -23,17 +23,30 @@ if (!isset($_SESSION["user_id"])) {
 
 
 // ------------------------------------
-// ONLY POST REQUEST
+// CHECK LOGIN
+// ------------------------------------
+
+if (!isset($_SESSION["user_id"])) {
+
+    sendError(
+        "User is not logged in."
+    );
+}
+
+
+$user_id =
+    (int)$_SESSION["user_id"];
+
+
+// ------------------------------------
+// CHECK REQUEST
 // ------------------------------------
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
-    echo json_encode([
-        "success" => false,
-        "message" => "Invalid request."
-    ]);
-
-    exit;
+    sendError(
+        "Invalid request method."
+    );
 }
 
 
@@ -47,27 +60,43 @@ if (
     count($_SESSION["quiz_questions"]) === 0
 ) {
 
-    echo json_encode([
-        "success" => false,
-        "message" => "Quiz session expired. Please start the quiz again."
-    ]);
-
-    exit;
+    sendError(
+        "Quiz session expired. Please start the quiz again."
+    );
 }
 
 
-$question_ids = $_SESSION["quiz_questions"];
+$question_ids =
+    $_SESSION["quiz_questions"];
 
 
 // ------------------------------------
-// GET USER ANSWERS
+// GET ANSWERS
 // ------------------------------------
 
-$user_answers = $_POST["answer"] ?? [];
+$user_answers =
+    $_POST["answer"] ?? [];
 
 if (!is_array($user_answers)) {
+
     $user_answers = [];
 }
+
+
+// ------------------------------------
+// CHECK QUIZ SET
+// ------------------------------------
+
+if (!isset($_SESSION["quiz_set_id"])) {
+
+    sendError(
+        "Quiz set information is missing."
+    );
+}
+
+
+$set_id =
+    (int)$_SESSION["quiz_set_id"];
 
 
 // ------------------------------------
@@ -75,76 +104,93 @@ if (!is_array($user_answers)) {
 // ------------------------------------
 
 $possible_columns = [
+
     "correct_option",
+
     "correct_answer",
+
     "correct",
+
     "answer",
+
     "correct_ans"
+
 ];
 
-$columns_result = $conn->query("SHOW COLUMNS FROM questions");
+
+$columns_result =
+    $conn->query(
+        "SHOW COLUMNS FROM questions"
+    );
+
 
 if (!$columns_result) {
 
-    echo json_encode([
-        "success" => false,
-        "message" => "Unable to read questions table."
-    ]);
-
-    exit;
+    sendError(
+        "Unable to read questions table: " .
+        $conn->error
+    );
 }
 
 
 $available_columns = [];
 
-while ($column = $columns_result->fetch_assoc()) {
 
-    $available_columns[] = $column["Field"];
+while (
+    $column =
+    $columns_result->fetch_assoc()
+) {
 
+    $available_columns[] =
+        $column["Field"];
 }
 
 
 $correct_column = null;
 
 
-foreach ($possible_columns as $column) {
+foreach (
+    $possible_columns as $column
+) {
 
-    if (in_array($column, $available_columns, true)) {
+    if (
+        in_array(
+            $column,
+            $available_columns,
+            true
+        )
+    ) {
 
-        $correct_column = $column;
+        $correct_column =
+            $column;
 
         break;
-
     }
-
 }
 
-
-// ------------------------------------
-// CORRECT ANSWER COLUMN NOT FOUND
-// ------------------------------------
 
 if ($correct_column === null) {
 
-    echo json_encode([
-        "success" => false,
-        "message" =>
-            "Could not find the correct-answer column in the questions table. " .
-            "Available columns: " .
-            implode(", ", $available_columns)
-    ]);
-
-    exit;
+    sendError(
+        "Correct-answer column not found in questions table."
+    );
 }
 
 
 // ------------------------------------
-// NORMALIZE ANSWERS
+// NORMALIZE ANSWER
 // ------------------------------------
 
 function normalizeAnswer($answer)
 {
-    $answer = strtoupper(trim((string)$answer));
+
+    $answer =
+        strtoupper(
+            trim(
+                (string)$answer
+            )
+        );
+
 
     switch ($answer) {
 
@@ -175,12 +221,17 @@ function normalizeAnswer($answer)
 // ------------------------------------
 
 $score = 0;
-$total = count($question_ids);
+
+$total =
+    count($question_ids);
 
 
-foreach ($question_ids as $question_id) {
+foreach (
+    $question_ids as $question_id
+) {
 
-    $question_id = (int)$question_id;
+    $question_id =
+        (int)$question_id;
 
 
     $sql = "SELECT `$correct_column`
@@ -189,108 +240,229 @@ foreach ($question_ids as $question_id) {
             LIMIT 1";
 
 
-    $stmt = $conn->prepare($sql);
+    $stmt =
+        $conn->prepare($sql);
+
 
     if (!$stmt) {
 
-        echo json_encode([
-            "success" => false,
-            "message" => "Database error: " . $conn->error
-        ]);
-
-        exit;
+        sendError(
+            "Database error: " .
+            $conn->error
+        );
     }
 
 
-    $stmt->bind_param("i", $question_id);
+    $stmt->bind_param(
+        "i",
+        $question_id
+    );
 
-    $stmt->execute();
 
-    $result = $stmt->get_result();
+    if (!$stmt->execute()) {
+
+        $stmt->close();
+
+        sendError(
+            "Unable to check question answer."
+        );
+    }
 
 
-    if ($result->num_rows === 1) {
+    $result =
+        $stmt->get_result();
 
-        $row = $result->fetch_assoc();
+
+    if (
+        $result->num_rows === 1
+    ) {
+
+        $row =
+            $result->fetch_assoc();
+
 
         $correct_answer =
-            normalizeAnswer($row[$correct_column]);
+            normalizeAnswer(
+                $row[$correct_column]
+            );
 
 
         $user_answer =
             normalizeAnswer(
-                $user_answers[$question_id] ?? ""
+                $user_answers[$question_id]
+                ?? ""
             );
 
 
         if (
             $user_answer !== "" &&
-            $user_answer === $correct_answer
+            $user_answer ===
+            $correct_answer
         ) {
 
             $score++;
-
         }
-
     }
 
 
     $stmt->close();
-
 }
 
 
 // ------------------------------------
-// CALCULATE PERCENTAGE
+// PERCENTAGE
 // ------------------------------------
 
 $percentage = 0;
 
+
 if ($total > 0) {
 
     $percentage =
-        round(($score / $total) * 100, 2);
-
+        round(
+            ($score / $total) * 100,
+            2
+        );
 }
+
+
+// ------------------------------------
+// TIME TAKEN
+// ------------------------------------
+
+$time_taken_seconds = 0;
+
+
+// ------------------------------------
+// SAVE QUIZ ATTEMPT
+// ------------------------------------
+
+$sql = "INSERT INTO quiz_attempts
+        (
+            user_id,
+            set_id,
+            score,
+            total_questions,
+            time_taken_seconds,
+            date_attempted
+        )
+        VALUES (?, ?, ?, ?, ?, NOW())";
+
+
+$stmt =
+    $conn->prepare($sql);
+
+
+if (!$stmt) {
+
+    sendError(
+        "Unable to prepare quiz attempt: " .
+        $conn->error
+    );
+}
+
+
+// user_id = INT
+// set_id = INT
+// score = INT
+// total_questions = INT
+// time_taken_seconds = INT
+
+$stmt->bind_param(
+    "iiiii",
+    $user_id,
+    $set_id,
+    $score,
+    $total,
+    $time_taken_seconds
+);
+
+
+if (!$stmt->execute()) {
+
+    $error =
+        $stmt->error;
+
+    $stmt->close();
+
+    sendError(
+        "Unable to save quiz attempt: " .
+        $error
+    );
+}
+
+
+// ------------------------------------
+// GET ATTEMPT ID
+// ------------------------------------
+
+$attempt_id =
+    $conn->insert_id;
+
+
+$stmt->close();
 
 
 // ------------------------------------
 // SAVE RESULT IN SESSION
 // ------------------------------------
 
-$_SESSION["quiz_score"] = $score;
+$_SESSION["quiz_score"] =
+    $score;
 
-$_SESSION["quiz_total"] = $total;
+$_SESSION["quiz_total"] =
+    $total;
 
-$_SESSION["quiz_percentage"] = $percentage;
+$_SESSION["quiz_percentage"] =
+    $percentage;
 
-
-// ------------------------------------
-// CLEAR QUIZ QUESTIONS
-// ------------------------------------
-
-unset($_SESSION["quiz_questions"]);
-
-unset($_SESSION["quiz_set_id"]);
-
-unset($_SESSION["quiz_category_id"]);
-
-unset($_SESSION["quiz_timer"]);
+$_SESSION["quiz_attempt_id"] =
+    $attempt_id;
 
 
 // ------------------------------------
-// SEND RESULT
+// CLEAR ACTIVE QUIZ SESSION
+// ------------------------------------
+
+unset(
+    $_SESSION["quiz_questions"]
+);
+
+unset(
+    $_SESSION["quiz_set_id"]
+);
+
+unset(
+    $_SESSION["quiz_category_id"]
+);
+
+unset(
+    $_SESSION["quiz_timer"]
+);
+
+
+// ------------------------------------
+// SEND SUCCESS RESPONSE
 // ------------------------------------
 
 echo json_encode([
 
     "success" => true,
 
-    "score" => $score,
+    "message" =>
+        "Quiz submitted successfully.",
 
-    "total" => $total,
+    "score" =>
+        $score,
 
-    "percentage" => $percentage
+    "total" =>
+        $total,
+
+    "percentage" =>
+        $percentage,
+
+    "attempt_id" =>
+        $attempt_id
 
 ]);
 

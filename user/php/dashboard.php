@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once "../../config/database.php";
@@ -9,8 +10,9 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
+// Get logged-in user's information
 $user_id = $_SESSION["user_id"];
-$user_name = $_SESSION["user_name"] ?? "User";
+$user_name = $_SESSION["name"] ?? "User";
 
 // Default dashboard values
 $total_quizzes = 0;
@@ -20,6 +22,7 @@ $rank = "-";
 
 // Get total question sets
 $sql = "SELECT COUNT(*) AS total FROM question_sets";
+
 $result = $conn->query($sql);
 
 if ($result) {
@@ -27,7 +30,7 @@ if ($result) {
     $total_quizzes = $row["total"];
 }
 
-// If quiz_attempts table exists, try to get user statistics
+// Check if quiz_attempts table exists
 $tableCheck = $conn->query("SHOW TABLES LIKE 'quiz_attempts'");
 
 if ($tableCheck && $tableCheck->num_rows > 0) {
@@ -40,7 +43,9 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
-        $stmt->bind_param("s", $user_id);
+
+        $stmt->bind_param("i", $user_id);
+
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -48,6 +53,38 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
         if ($result) {
             $row = $result->fetch_assoc();
             $quizzes_taken = $row["total"] ?? 0;
+        }
+
+        $stmt->close();
+    }
+
+    // Calculate average score
+    $sql = "SELECT AVG(
+                CASE
+                    WHEN total_questions > 0
+                    THEN (score / total_questions) * 100
+                    ELSE 0
+                END
+            ) AS average
+            FROM quiz_attempts
+            WHERE user_id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+
+        $stmt->bind_param("i", $user_id);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result) {
+            $row = $result->fetch_assoc();
+
+            if ($row["average"] !== null) {
+                $average_score = round($row["average"], 1);
+            }
         }
 
         $stmt->close();
@@ -60,7 +97,9 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Dashboard - QuizWorld</title>
@@ -68,11 +107,13 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     <link rel="stylesheet" href="../css/dashboard.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+
 </head>
 
 <body>
@@ -80,6 +121,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
 <div class="container">
 
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
         <h2>QUIZWORLD</h2>
@@ -120,12 +162,15 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
 
 
     <!-- MAIN CONTENT -->
+
     <main class="main-content">
+
+        <!-- WELCOME -->
 
         <section class="welcome">
 
             <h1>
-                Welcome, <?= htmlspecialchars($user_name) ?>
+                Welcome back, <?= htmlspecialchars($user_name) ?>
             </h1>
 
             <p>
@@ -136,32 +181,49 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
 
 
         <!-- STATISTICS -->
+
         <div class="card-container">
 
             <div class="card total">
+
                 <h3>Total Quizzes</h3>
+
                 <p><?= $total_quizzes ?></p>
+
             </div>
+
 
             <div class="card taken">
+
                 <h3>Quizzes Taken</h3>
+
                 <p><?= $quizzes_taken ?></p>
+
             </div>
+
 
             <div class="card score">
+
                 <h3>Average Score</h3>
+
                 <p><?= $average_score ?>%</p>
+
             </div>
 
+
             <div class="card rank">
+
                 <h3>Your Rank</h3>
+
                 <p><?= htmlspecialchars((string)$rank) ?></p>
+
             </div>
 
         </div>
 
 
         <!-- CONTINUE QUIZ -->
+
         <section class="continue-quiz">
 
             <h2>Ready for your next challenge?</h2>
@@ -177,13 +239,16 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
             <button
                 type="button"
                 onclick="window.location.href='../php/categories.php'">
+
                 Continue Quiz
+
             </button>
 
         </section>
 
 
         <!-- PROGRESS -->
+
         <section class="progress-section">
 
             <h2>Your Progress</h2>
@@ -191,15 +256,25 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
             <div class="progress-cards">
 
                 <div class="progress-box">
-                    User ID: <?= htmlspecialchars($user_id) ?>
+
+                    User ID:
+                    <?= htmlspecialchars((string)$user_id) ?>
+
                 </div>
 
-                <div class="progress-box">
-                    Quizzes Completed: <?= $quizzes_taken ?>
-                </div>
 
                 <div class="progress-box">
+
+                    Quizzes Completed:
+                    <?= $quizzes_taken ?>
+
+                </div>
+
+
+                <div class="progress-box">
+
                     Keep practicing!
+
                 </div>
 
             </div>
@@ -211,4 +286,5 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
 </div>
 
 </body>
+
 </html>

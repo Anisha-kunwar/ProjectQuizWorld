@@ -1,25 +1,32 @@
 <?php
+
 session_start();
 
 require_once "../../config/database.php";
 
+// ------------------------------------
+// CHECK LOGIN
+// ------------------------------------
 
-// Check login
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../html/login.html");
     exit;
 }
 
+// ------------------------------------
+// CHECK CATEGORY
+// ------------------------------------
 
-// Check category
 if (!isset($_GET["category_id"]) || !is_numeric($_GET["category_id"])) {
     die("Category not selected.");
 }
 
 $category_id = (int)$_GET["category_id"];
 
+// ------------------------------------
+// GET QUIZ SET
+// ------------------------------------
 
-// Find question set for this category
 $sql = "SELECT set_id, timer_sec
         FROM question_sets
         WHERE category_id = ?
@@ -45,17 +52,17 @@ $question_set = $result->fetch_assoc();
 $stmt->close();
 
 $set_id = (int)$question_set["set_id"];
-
-
-// Timer
 $timer_sec = (int)$question_set["timer_sec"];
 
+// If timer is missing/invalid, use 5 minutes
 if ($timer_sec <= 0) {
     $timer_sec = 300;
 }
 
+// ------------------------------------
+// GET 10 RANDOM QUESTIONS
+// ------------------------------------
 
-// Get 10 random questions
 $sql = "SELECT
             question_id,
             question_text,
@@ -84,32 +91,29 @@ $questions = [];
 while ($row = $result->fetch_assoc()) {
 
     $questions[] = [
-
         "question_id" => (int)$row["question_id"],
-
         "question_text" => $row["question_text"],
-
         "option_a" => $row["option_a"],
-
         "option_b" => $row["option_b"],
-
         "option_c" => $row["option_c"],
-
         "option_d" => $row["option_d"]
-
     ];
 }
 
 $stmt->close();
 
+// ------------------------------------
+// CHECK QUESTIONS
+// ------------------------------------
 
-// Make sure questions exist
 if (count($questions) === 0) {
-    die("No questions available for this quiz.");
+    die("No questions found for this quiz.");
 }
 
+// ------------------------------------
+// SAVE QUIZ INFORMATION IN SESSION
+// ------------------------------------
 
-// Store quiz information in session
 $_SESSION["quiz_questions"] = array_column(
     $questions,
     "question_id"
@@ -121,8 +125,10 @@ $_SESSION["quiz_category_id"] = $category_id;
 
 $_SESSION["quiz_timer"] = $timer_sec;
 
+// ------------------------------------
+// SEND QUESTIONS TO JAVASCRIPT
+// ------------------------------------
 
-// Convert questions to JSON
 $questions_json = json_encode(
     $questions,
     JSON_HEX_TAG |
@@ -142,119 +148,122 @@ $questions_json = json_encode(
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Quiz - QuizWorld</title>
-
-    <link rel="stylesheet" href="../css/quiz.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>QuizWorld Quiz</title>
 
     <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+        rel="stylesheet"
+        href="../css/quiz.css"
+    >
 
 </head>
 
-
 <body>
 
+<div class="quiz-container">
 
-<div class="quiz-box">
+    <!-- HEADER -->
 
-    <h1>QuizWorld</h1>
+    <div class="quiz-header">
 
+        <h1>QUIZWORLD</h1>
 
-    <!-- TIMER -->
-
-    <div class="timer">
-
-        Time Left:
-
-        <span id="time">
-            00:00
-        </span>
-
-    </div>
-
-
-    <!-- PROGRESS -->
-
-    <div class="progress-container">
-
-        <div
-            class="progress-bar"
-            id="progressBar">
+        <div class="timer">
+            Time:
+            <span id="timer">00:00</span>
         </div>
 
     </div>
 
 
-    <!-- QUESTION NUMBER -->
+    <!-- QUESTION AREA -->
 
-    <div id="questionNumber">
-        Question 1 of <?= count($questions) ?>
-    </div>
+    <div class="quiz-box">
+
+        <div class="question-number">
+            Question
+            <span id="questionNumber">1</span>
+            /
+            <span id="totalQuestions">
+                <?= count($questions) ?>
+            </span>
+        </div>
 
 
-    <!-- QUESTION -->
+        <h2 id="questionText">
+            Loading question...
+        </h2>
 
-    <div class="question-card">
 
-        <div id="question"></div>
-
+        <!-- OPTIONS -->
 
         <div class="options">
 
-            <button
-                type="button"
-                class="option"
-                data-option="A">
-            </button>
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="A"
+                >
+                <span id="optionA"></span>
+            </label>
 
-            <button
-                type="button"
-                class="option"
-                data-option="B">
-            </button>
 
-            <button
-                type="button"
-                class="option"
-                data-option="C">
-            </button>
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="B"
+                >
+                <span id="optionB"></span>
+            </label>
 
-            <button
-                type="button"
-                class="option"
-                data-option="D">
-            </button>
+
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="C"
+                >
+                <span id="optionC"></span>
+            </label>
+
+
+            <label class="option">
+                <input
+                    type="radio"
+                    name="answer"
+                    value="D"
+                >
+                <span id="optionD"></span>
+            </label>
 
         </div>
 
-    </div>
+
+        <!-- BUTTONS -->
+
+        <div class="quiz-buttons">
+
+            <button
+                type="button"
+                id="nextButton"
+            >
+                Next
+            </button>
 
 
-    <!-- BUTTONS -->
+            <button
+                type="button"
+                id="submitButton"
+                style="display:none;"
+            >
+                Submit Quiz
+            </button>
 
-    <div class="buttons">
-
-        <button
-            type="button"
-            id="next">
-            Next
-        </button>
-
-        <button
-            type="button"
-            id="submit">
-            Submit
-        </button>
+        </div>
 
     </div>
 
@@ -263,7 +272,16 @@ $questions_json = json_encode(
 
 <script>
 
+// ------------------------------------
+// QUESTIONS FROM PHP
+// ------------------------------------
+
 const questions = <?= $questions_json ?>;
+
+
+// ------------------------------------
+// QUIZ VARIABLES
+// ------------------------------------
 
 let currentQuestion = 0;
 
@@ -274,301 +292,15 @@ let answers = {};
 let submitted = false;
 
 
-// Timer
-let timeLeft = <?= $timer_sec ?>;
-
-
-// HTML elements
-const questionElement =
-    document.getElementById("question");
-
-const questionNumberElement =
-    document.getElementById("questionNumber");
-
-const timeElement =
-    document.getElementById("time");
-
-const progressBar =
-    document.getElementById("progressBar");
-
-const optionButtons =
-    document.querySelectorAll(".option");
-
-const nextButton =
-    document.getElementById("next");
-
-const submitButton =
-    document.getElementById("submit");
-
-
-// ------------------------------------
-// LOAD QUESTION
-// ------------------------------------
-
-function loadQuestion() {
-
-    const q = questions[currentQuestion];
-
-    questionElement.textContent =
-        q.question_text;
-
-
-    optionButtons[0].textContent =
-        q.option_a;
-
-    optionButtons[1].textContent =
-        q.option_b;
-
-    optionButtons[2].textContent =
-        q.option_c;
-
-    optionButtons[3].textContent =
-        q.option_d;
-
-
-    questionNumberElement.textContent =
-        "Question " +
-        (currentQuestion + 1) +
-        " of " +
-        questions.length;
-
-
-    const progress =
-        ((currentQuestion + 1) / questions.length) * 100;
-
-    progressBar.style.width =
-        progress + "%";
-
-
-    // Remove previous selection
-    optionButtons.forEach(function(button) {
-
-        button.classList.remove("selected");
-
-    });
-
-
-    selectedAnswer = null;
-
-
-    // Restore previously selected answer
-    const questionId = q.question_id;
-
-    if (answers[questionId]) {
-
-        selectedAnswer =
-            answers[questionId];
-
-        optionButtons.forEach(function(button) {
-
-            if (
-                button.dataset.option ===
-                selectedAnswer
-            ) {
-
-                button.classList.add("selected");
-
-            }
-
-        });
-
-    }
-
-
-    // Show / hide buttons
-    if (currentQuestion === questions.length - 1) {
-
-        nextButton.style.display = "none";
-
-        submitButton.style.display = "block";
-
-    } else {
-
-        nextButton.style.display = "block";
-
-        submitButton.style.display = "block";
-
-    }
-
-}
-
-
-// ------------------------------------
-// SELECT OPTION
-// ------------------------------------
-
-optionButtons.forEach(function(button) {
-
-    button.addEventListener("click", function() {
-
-        optionButtons.forEach(function(btn) {
-
-            btn.classList.remove("selected");
-
-        });
-
-
-        button.classList.add("selected");
-
-
-        selectedAnswer =
-            button.dataset.option;
-
-
-        const questionId =
-            questions[currentQuestion].question_id;
-
-
-        answers[questionId] =
-            selectedAnswer;
-
-    });
-
-});
-
-
-// ------------------------------------
-// NEXT QUESTION
-// ------------------------------------
-
-nextButton.addEventListener("click", function() {
-
-    if (!selectedAnswer) {
-
-        alert("Please select an answer.");
-
-        return;
-
-    }
-
-
-    const questionId =
-        questions[currentQuestion].question_id;
-
-
-    answers[questionId] =
-        selectedAnswer;
-
-
-    currentQuestion++;
-
-
-    loadQuestion();
-
-});
-
-
-// ------------------------------------
-// SUBMIT QUIZ
-// ------------------------------------
-
-function submitQuiz() {
-
-    if (submitted) {
-        return;
-    }
-
-    submitted = true;
-
-
-    const formData =
-        new FormData();
-
-
-    Object.keys(answers).forEach(function(questionId) {
-
-        formData.append(
-            "answer[" + questionId + "]",
-            answers[questionId]
-        );
-
-    });
-
-
-    fetch("submit.php", {
-
-        method: "POST",
-
-        body: formData
-
-    })
-
-    .then(function(response) {
-
-        return response.json();
-
-    })
-
-    .then(function(data) {
-
-        if (data.success) {
-
-            window.location.href =
-                "result.php?score=" +
-                encodeURIComponent(data.score) +
-                "&total=" +
-                encodeURIComponent(data.total) +
-                "&percentage=" +
-                encodeURIComponent(data.percentage);
-
-        } else {
-
-            submitted = false;
-
-            alert(
-                data.message ||
-                "Unable to submit quiz."
-            );
-
-        }
-
-    })
-
-    .catch(function(error) {
-
-        submitted = false;
-
-        console.error(error);
-
-        alert(
-            "Something went wrong while submitting the quiz."
-        );
-
-    });
-
-}
-
-
-submitButton.addEventListener(
-    "click",
-    function() {
-
-        if (!selectedAnswer) {
-
-            alert("Please select an answer.");
-
-            return;
-
-        }
-
-
-        const questionId =
-            questions[currentQuestion].question_id;
-
-
-        answers[questionId] =
-            selectedAnswer;
-
-
-        submitQuiz();
-
-    }
-);
-
-
 // ------------------------------------
 // TIMER
 // ------------------------------------
+
+let timeLeft = <?= $timer_sec ?>;
+
+const timerElement =
+    document.getElementById("timer");
+
 
 function updateTimer() {
 
@@ -578,46 +310,426 @@ function updateTimer() {
     const seconds =
         timeLeft % 60;
 
-
-    timeElement.textContent =
-
+    timerElement.textContent =
         String(minutes).padStart(2, "0") +
         ":" +
         String(seconds).padStart(2, "0");
 
+}
+
+
+const timerInterval = setInterval(() => {
+
+    if (submitted) {
+        clearInterval(timerInterval);
+        return;
+    }
 
     if (timeLeft <= 0) {
 
-        clearInterval(timer);
+        clearInterval(timerInterval);
 
-        submitQuiz();
+        submitQuiz(true);
 
         return;
+    }
+
+    timeLeft--;
+
+    updateTimer();
+
+}, 1000);
+
+
+// ------------------------------------
+// HTML ELEMENTS
+// ------------------------------------
+
+const questionNumber =
+    document.getElementById("questionNumber");
+
+const totalQuestions =
+    document.getElementById("totalQuestions");
+
+const questionText =
+    document.getElementById("questionText");
+
+const optionA =
+    document.getElementById("optionA");
+
+const optionB =
+    document.getElementById("optionB");
+
+const optionC =
+    document.getElementById("optionC");
+
+const optionD =
+    document.getElementById("optionD");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const submitButton =
+    document.getElementById("submitButton");
+
+const optionInputs =
+    document.querySelectorAll(
+        'input[name="answer"]'
+    );
+
+
+// ------------------------------------
+// LOAD QUESTION
+// ------------------------------------
+
+function loadQuestion() {
+
+    const question =
+        questions[currentQuestion];
+
+    questionNumber.textContent =
+        currentQuestion + 1;
+
+    totalQuestions.textContent =
+        questions.length;
+
+    questionText.textContent =
+        question.question_text;
+
+    optionA.textContent =
+        question.option_a;
+
+    optionB.textContent =
+        question.option_b;
+
+    optionC.textContent =
+        question.option_c;
+
+    optionD.textContent =
+        question.option_d;
+
+
+    // Clear previous selection
+
+    optionInputs.forEach(input => {
+
+        input.checked = false;
+
+    });
+
+
+    selectedAnswer = null;
+
+
+    // Restore answer if already selected
+
+    const questionId =
+        question.question_id;
+
+    if (answers[questionId]) {
+
+        optionInputs.forEach(input => {
+
+            if (
+                input.value ===
+                answers[questionId]
+            ) {
+
+                input.checked = true;
+
+                selectedAnswer =
+                    input.value;
+            }
+
+        });
 
     }
 
 
-    timeLeft--;
+    // --------------------------------
+    // BUTTON VISIBILITY
+    // --------------------------------
+
+    if (
+        currentQuestion ===
+        questions.length - 1
+    ) {
+
+        nextButton.style.display =
+            "none";
+
+        submitButton.style.display =
+            "block";
+
+    } else {
+
+        nextButton.style.display =
+            "block";
+
+        submitButton.style.display =
+            "none";
+    }
 
 }
 
 
-const timer =
-    setInterval(updateTimer, 1000);
+// ------------------------------------
+// OPTION SELECTION
+// ------------------------------------
+
+optionInputs.forEach(input => {
+
+    input.addEventListener(
+        "change",
+        function () {
+
+            selectedAnswer =
+                this.value;
+
+            const questionId =
+                questions[currentQuestion]
+                    .question_id;
+
+            answers[questionId] =
+                this.value;
+
+        }
+    );
+
+});
 
 
 // ------------------------------------
-// START
+// NEXT BUTTON
 // ------------------------------------
 
-submitButton.style.display = "none";
+nextButton.addEventListener(
+    "click",
+    function () {
+
+        const questionId =
+            questions[currentQuestion]
+                .question_id;
+
+        if (!answers[questionId]) {
+
+            alert(
+                "Please select an answer first."
+            );
+
+            return;
+        }
+
+
+        if (
+            currentQuestion <
+            questions.length - 1
+        ) {
+
+            currentQuestion++;
+
+            loadQuestion();
+        }
+
+    }
+);
+
+
+// ------------------------------------
+// SUBMIT BUTTON
+// ------------------------------------
+
+submitButton.addEventListener(
+    "click",
+    function () {
+
+        const questionId =
+            questions[currentQuestion]
+                .question_id;
+
+        if (!answers[questionId]) {
+
+            alert(
+                "Please select an answer first."
+            );
+
+            return;
+        }
+
+        submitQuiz(false);
+
+    }
+);
+
+
+// ------------------------------------
+// SUBMIT QUIZ
+// ------------------------------------
+
+async function submitQuiz(autoSubmit = false) {
+
+    if (submitted) {
+        return;
+    }
+
+    submitted = true;
+
+    clearInterval(timerInterval);
+
+
+    if (autoSubmit) {
+
+        alert(
+            "Time is over! Your quiz will be submitted."
+        );
+
+    }
+
+
+    const formData =
+        new FormData();
+
+
+    // --------------------------------
+    // SEND ALL ANSWERS
+    // --------------------------------
+
+    Object.keys(answers).forEach(
+        questionId => {
+
+            formData.append(
+                "answer[" + questionId + "]",
+                answers[questionId]
+            );
+
+        }
+    );
+
+
+    try {
+
+        submitButton.disabled = true;
+
+        nextButton.disabled = true;
+
+
+        const response =
+            await fetch("../php/submit.php", {
+
+                method: "POST",
+
+                body: formData
+
+            });
+
+
+        const text =
+            await response.text();
+
+
+        console.log(
+            "submit.php response:",
+            text
+        );
+
+
+        let data;
+
+        try {
+
+            data = JSON.parse(text);
+
+        } catch (error) {
+
+            console.error(
+                "Invalid JSON:",
+                text
+            );
+
+            alert(
+                "Server returned an invalid response. Check submit.php."
+            );
+
+            submitted = false;
+
+            submitButton.disabled = false;
+
+            nextButton.disabled = false;
+
+            return;
+        }
+
+
+        // --------------------------------
+        // SUCCESS
+        // --------------------------------
+
+        if (data.success) {
+
+            if (!data.attempt_id) {
+
+                alert(
+                    "Quiz submitted, but attempt ID is missing."
+                );
+
+                return;
+            }
+
+
+            window.location.href =
+                "result.php?attempt_id=" +
+                encodeURIComponent(
+                    data.attempt_id
+                );
+
+        }
+
+        // --------------------------------
+        // ERROR
+        // --------------------------------
+
+        else {
+
+            alert(
+                data.message ||
+                "Unable to submit quiz."
+            );
+
+            submitted = false;
+
+            submitButton.disabled = false;
+
+            nextButton.disabled = false;
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Something went wrong while submitting the quiz."
+        );
+
+        submitted = false;
+
+        submitButton.disabled = false;
+
+        nextButton.disabled = false;
+    }
+
+}
+
+
+// ------------------------------------
+// START QUIZ
+// ------------------------------------
 
 loadQuestion();
 
 updateTimer();
 
 </script>
-
 
 </body>
 </html>

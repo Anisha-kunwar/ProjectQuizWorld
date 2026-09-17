@@ -12,26 +12,22 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 $user_id = trim($_POST["user_id"] ?? "");
 $password = $_POST["password"] ?? "";
 
-if ($user_id === "") {
-    die("User ID is required.");
+if ($user_id === "" || $password === "") {
+    die("ERROR: User ID and password are required.");
 }
 
-if ($password === "") {
-    die("Password is required.");
-}
-
-$sql = "SELECT user_id, name, email, password
-        FROM users
-        WHERE user_id = ?
-        LIMIT 1";
-
-$stmt = $conn->prepare($sql);
+$stmt = $conn->prepare(
+    "SELECT user_id, name, email, password
+     FROM users
+     WHERE user_id = ?
+     LIMIT 1"
+);
 
 if (!$stmt) {
-    die("Database error.");
+    die("PREPARE ERROR: " . $conn->error);
 }
 
-$stmt->bind_param("s", $user_id);
+$stmt->bind_param("i", $user_id);
 $stmt->execute();
 
 $result = $stmt->get_result();
@@ -46,13 +42,11 @@ if (!password_verify($password, $user["password"])) {
     die("Invalid User ID or password.");
 }
 
-session_regenerate_id(true);
-
 $_SESSION["user_id"] = $user["user_id"];
-$_SESSION["user_name"] = $user["name"];
-$_SESSION["user_email"] = $user["email"];
+$_SESSION["name"] = $user["name"];
+$_SESSION["email"] = $user["email"];
 
-header("Location: ../dashboard.php");
+header("Location: ../php/dashboard.php");
 exit;
 
 ?>

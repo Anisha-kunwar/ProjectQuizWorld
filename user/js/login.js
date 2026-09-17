@@ -1,59 +1,26 @@
-// Get the form
-
 let form = document.getElementById("loginForm");
-
-
-// Run validation when the form is submitted
 
 form.addEventListener("submit", function (event) {
 
-    event.preventDefault();
+    let userId = document.getElementById("user_id").value.trim();
+    let password = document.getElementById("password").value;
 
-
-    // Get input values
-
-    let username =
-    document.getElementById("username").value.trim();
-
-    let password =
-    document.getElementById("password").value;
-
-
-    // Username or Email Validation
-
-    if (username === "") {
-
-        alert("Please enter your Username or Email.");
+    if (userId === "") {
+        event.preventDefault();
+        alert("Please enter your User ID.");
         return;
-
     }
-
-
-    // Password Validation
 
     if (password === "") {
-
+        event.preventDefault();
         alert("Please enter your Password.");
         return;
-
     }
-
-
-    // Password Length Validation
 
     if (password.length < 8) {
-
+        event.preventDefault();
         alert("Password must contain at least 8 characters.");
         return;
-
     }
-
-
-    // Success Message
-
-    alert("Login Successful!");
-
-window.location.href = "dashboard.html";
-
 
 });

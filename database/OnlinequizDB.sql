@@ -1,4 +1,4 @@
-CREATE DATABASE quizpl;
+
 
 USE quizpl;
 

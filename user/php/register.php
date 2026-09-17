@@ -1,91 +1,102 @@
+
 <?php
 
-// Get the form data
+require_once "../../config/database.php";
 
-$fullname = trim($_POST["fullname"]);
-$email = trim($_POST["email"]);
-$username = trim($_POST["username"]);
-$password = $_POST["password"];
-$confirmPassword = $_POST["confirmPassword"];
-
-
-// Full Name Validation
-
-if (empty($fullname))
-{
-    die("Full Name is required.");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    die("ERROR: Invalid request.");
 }
 
+$name = trim($_POST["fullname"] ?? "");
+$email = trim($_POST["email"] ?? "");
+$password = $_POST["password"] ?? "";
+$confirmPassword = $_POST["confirmPassword"] ?? "";
 
-// Email Validation
-
-if (empty($email))
-{
-    die("Email is required.");
+if ($name === "" || $email === "" || $password === "") {
+    die("ERROR: All fields are required.");
 }
 
-
-// Check Email Format
-
-if (!filter_var($email, FILTER_VALIDATE_EMAIL))
-{
-    die("Please enter a valid Email.");
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    die("ERROR: Invalid email address.");
 }
 
-
-// Username Validation
-
-if (empty($username))
-{
-    die("Username is required.");
+if (strlen($password) < 8) {
+    die("ERROR: Password must contain at least 8 characters.");
 }
 
-
-// Password Validation
-
-if (empty($password))
-{
-    die("Password is required.");
+if ($password !== $confirmPassword) {
+    die("ERROR: Passwords do not match.");
 }
 
+/* Check whether email already exists */
+$check = $conn->prepare("SELECT user_id FROM users WHERE email = ? LIMIT 1");
 
-// Password Length
-
-if (strlen($password) < 8)
-{
-    die("Password must contain at least 8 characters.");
+if (!$check) {
+    die("PREPARE ERROR: " . $conn->error);
 }
 
+$check->bind_param("s", $email);
+$check->execute();
+$check->store_result();
 
-// Confirm Password Validation
-
-if (empty($confirmPassword))
-{
-    die("Please confirm your password.");
+if ($check->num_rows > 0) {
+    die("ERROR: This email is already registered.");
 }
 
+$check->close();
 
-// Password Match
+/* Hash password */
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-if ($password != $confirmPassword)
-{
-    die("Passwords do not match.");
+/* Insert user */
+$stmt = $conn->prepare(
+    "INSERT INTO users (name, email, password)
+     VALUES (?, ?, ?)"
+);
+
+if (!$stmt) {
+    die("PREPARE ERROR: " . $conn->error);
 }
 
+$stmt->bind_param("sss", $name, $email, $hashedPassword);
 
-// Terms and Conditions
-
-if (!isset($_POST["terms"]))
-{
-    die("Please accept the Terms & Conditions.");
+if (!$stmt->execute()) {
+    die("INSERT ERROR: " . $stmt->error);
 }
 
+$newUserId = $conn->insert_id;
 
-// If all validations are successful
-
-echo "Registration Successful!";
-
-
-
+$stmt->close();
+$conn->close();
 
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Successful</title>
+</head>
+
+<body>
+
+    <h2>Registration Successful!</h2>
+
+    <p>Name: <?php echo htmlspecialchars($name); ?></p>
+
+    <p>
+        Your User ID:
+        <strong><?php echo $newUserId; ?></strong>
+    </p>
+
+    <p>Email: <?php echo htmlspecialchars($email); ?></p>
+
+    <p>Your account has been created successfully.</p>
+
+    <p>
+        <a href="../html/login.html">Go to Login</a>
+    </p>
+
+</body>
+</html>
+

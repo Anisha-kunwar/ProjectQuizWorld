@@ -1,57 +1,63 @@
-let selectedOption = null;
+let selectedAnswer = null;
+
+const optionButtons = document.querySelectorAll(".option");
+const nextButton = document.getElementById("next");
+const submitButton = document.getElementById("submit");
 
 // Select an option
+optionButtons.forEach(function(option) {
 
-let options = document.querySelectorAll(".option");
+    option.addEventListener("click", function() {
 
-options.forEach(function(option){
-
-    option.addEventListener("click", function(){
-
-        options.forEach(function(btn){
+        optionButtons.forEach(function(btn) {
             btn.classList.remove("selected");
         });
 
         option.classList.add("selected");
 
-        selectedOption = option.innerText;
-
+        selectedAnswer = option.dataset.option;
     });
 
 });
 
 
 // Next Question Validation
+nextButton.addEventListener("click", function() {
 
-document.getElementById("next").addEventListener("click", function(){
-
-    if(selectedOption === null){
-
+    if (selectedAnswer === null) {
         alert("Please select an option.");
         return;
-
     }
 
-    // Load next question here
+    // Save answer
+    const questionId = questions[currentQuestion].question_id;
+    answers[questionId] = selectedAnswer;
 
-    selectedOption = null;
+    // Move to next question
+    currentQuestion++;
+
+    // Reset selection
+    selectedAnswer = null;
+
+    // Load next question
+    loadQuestion();
 
 });
 
 
 // Submit Quiz Validation
+submitButton.addEventListener("click", function() {
 
-document.getElementById("submit").addEventListener("click", function(){
-
-    if(selectedOption === null){
-
+    if (selectedAnswer === null) {
         alert("Please select an option.");
         return;
-
     }
 
-    alert("Quiz Submitted Successfully!");
+    // Save final answer
+    const questionId = questions[currentQuestion].question_id;
+    answers[questionId] = selectedAnswer;
 
-    window.location.href="result.html";
+    // Submit the complete quiz
+    submitQuiz();
 
 });
